@@ -1,0 +1,82 @@
+[project]
+name = "packaging-publishing-demo-jt"
+authors = [{name = "James Tyrrell"}]
+description = "Demo of git-tag versioning and automated publishing to TestPyPI"
+readme = "README.md"
+requires-python = ">=3.11.0"
+dynamic = ["version"]
+dependencies = []
+
+license = "MIT"
+license-files = ["LICENSE"]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+
+[project.urls]
+"Source Code" = "https://github.com/j-tyr/packaging-publishing-demo"
+
+# Development-only tools as a PEP 735 dependency group.
+# Install locally with `pip install -e . --group dev` (pip >= 25.1)
+# or `uv sync` (or `uv run <cmd>`).
+[dependency-groups]
+dev = [
+  "pytest",
+  "pytest-cov",
+  "coverage",
+  "tox",
+  "setuptools-scm",
+]
+
+[build-system]
+requires = [
+    "setuptools>=77",
+    "wheel",
+    "setuptools-scm[toml]>=8",
+]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["packaging_publishing_demo*"]
+exclude = ["tests*", "docs*"]
+
+# Required even though it is empty: this table is what switches
+# setuptools-scm's version computation on. Without it the build still
+# "succeeds", but silently produces version 0.0.0.
+[tool.setuptools_scm]
+
+[tool.pytest.ini_options]
+addopts = "--cov=packaging_publishing_demo"
+filterwarnings = [
+    "error",
+]
+
+# tox config in native TOML (not the older `legacy_tox_ini` string).
+# tox >= 4.22 is required: 4.21 reads native TOML but silently ignores
+# `dependency_groups`, so tests would run without the dev tools.
+[tool.tox]
+requires = ["tox>=4.22", "tox-gh-actions"]
+env_list = ["py311", "py312", "py313"]
+
+[tool.tox.gh-actions]
+python = """
+    3.11: py311
+    3.12: py312
+    3.13: py313
+"""
+
+[tool.tox.env_run_base]
+pass_env = ["CI", "GITHUB_ACTIONS"]
+dependency_groups = ["dev"]
+commands = [
+    ["python", "-c", "import packaging_publishing_demo as m; print('installed version:', m.__version__)"],
+    ["pytest", "-v", "--color=yes", "--cov=packaging_publishing_demo", "--cov-report=xml"],
+]
