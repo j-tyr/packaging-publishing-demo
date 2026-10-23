@@ -8,3 +8,7 @@ def test_greet():
 def test_version_is_set():
     # "0.1.devN+g<hash>" on ordinary CI runs, exactly "X.Y.Z" on a tag
     assert demo.__version__
+
+
+def test_farewell():
+    assert demo.farewell("CI").startswith("Goodbye, CI!")
