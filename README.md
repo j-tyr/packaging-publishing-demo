@@ -1,6 +1,6 @@
 # packaging-publishing-demo
 
-A small demo of an automated release pipeline, built before adopting it in a real project.
+A small demo of a semi-automated release pipeline, built before adopting it in a real project.
 
 It shows three things:
 
